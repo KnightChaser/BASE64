@@ -136,7 +136,7 @@ int main() {
 
 	BASE64 base64;
 
-	cout << base64.BASE64Encode("Hello World") << endl;
-	cout << base64.BASE64Encode("https://stackoverflow.com/") << endl;
+	cout << base64.BASE64Encode("Hello World") << endl;                     // SGVsbG8gV29ybGQ=
+	cout << base64.BASE64Encode("https://stackoverflow.com/") << endl;      // aHR0cHM6Ly9zdGFja292ZXJmbG93LmNvbS8=
 
 }
