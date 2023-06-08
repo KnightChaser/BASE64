@@ -1,4 +1,7 @@
-  #include <iostream>
+// Written in C++ 20
+// @KnightChaser
+
+#include <iostream>
 #include <bitset>
 #include <vector>
 #include <string>
@@ -38,29 +41,27 @@ public:
 
 
 // Binary style string -> Decimal integer
-int BASE64::binaryStringToDecimal(string binaryString)
-{
+int BASE64::binaryStringToDecimal(string binaryString) {
 
 	int num = stoi(binaryString);
-	int dec_value = 0;
+	int decimalValue = 0;
 
 	// Initializing base value to 1, i.e 2^0
 	int base = 1;
-
 	int temp = num;
 
 	while (temp) {
 
-		int last_digit = temp % 10;
+		int lastDigit = temp % 10;
 		temp = temp / 10;
 
-		dec_value += last_digit * base;
+		decimalValue += lastDigit * base;
 
 		base = base * 2;
 
 	}
 
-	return dec_value;
+	return decimalValue;
 }
 
 // General string -> Binary style string
@@ -105,7 +106,8 @@ string BASE64::binaryStringToBASE64(string binaryMessage) {
 	// substitution
 	string BASE64String = "";
 	for (string BASE64Character : BASE64Vector) {
-		BASE64String.push_back(BASE64Table[binaryStringToDecimal(BASE64Character)]);
+	    int decimalConvertedCharacter = BASE64::binaryStringToDecimal(BASE64Character);
+		BASE64String.push_back(BASE64::BASE64Table[decimalConvertedCharacter]);
 	}
 
 	// Consecutive "A"s in BASE64string should be replaced to "="(padding) because
