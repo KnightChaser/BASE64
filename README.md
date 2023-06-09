@@ -2,7 +2,7 @@
 
 Can I implement BASE64 in C++? 
 
-> My C++ implementation of BASE64 encoding/decoding algorithm. Referred to the Wikipedia's BASE64 specification.
+> My simplified C++ implementation of BASE64 encoding/decoding algorithm(Probably easy to understand, relatively.). Referred to the Wikipedia's BASE64 specification.
 
 <br>
 Very ez to use my implementation. Refer to the example.
