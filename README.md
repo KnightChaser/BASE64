@@ -49,47 +49,4 @@ https://www.github.com/
 
 
 #### Testing (Implementation verification)
-Ya feelin' doubtful now on my implementation? Then you can test my implementation with multiple randomly generated string that consists various ASCII printable characters. A testing can be implemented like... (Thanks to ChatGPT who did write that dull testing code.)
-```c++
-
-// Add this function that generates random ASCII string
-#include <random>
-
-std::string generateRandomString() {
-	std::random_device rd;
-	std::mt19937 gen(rd());
-
-	// Define the set of characters allowed in the random string
-	std::string allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!\"#$%&\'()*+,-./:;<=>?@[]^_`{|}~";
-
-	// Define the range of string lengths (between 8 and 16 characters)
-	std::uniform_int_distribution<> lengthDist(8, 16);
-	int length = lengthDist(gen);
-
-	// Generate the random string
-	std::string randomString;
-	std::uniform_int_distribution<> charDist(0, allowedChars.size() - 1);
-	for (int i = 0; i < length; ++i) {
-		randomString += allowedChars[charDist(gen)];
-	}
-
-	return randomString;
-}
-
-
-int main() {
-
-	// Verify with multiple implementation testing with randomly generated strings.
-	for (int _seq = 0; _seq < 100; _seq++) {
-		string randomString = generateRandomString();
-		cout << randomString << " ";
-		if ((BASE64::BASE64Decode(BASE64::BASE64Encode(randomString)) == randomString)) {
-			cout << "[OK]" << endl;
-		}
-		else {
-			cout << "[FAIL]" << endl;
-		}
-	}
-
-}
-```
+Ya feelin' doubtful now on my implementation? You may do because this is written from scratch. So, you can test my implementation with multiple randomly generated string that consists various ASCII printable characters. Visit https://github.com/KnightChaser/BASE64/blob/main/base64Test.cpp to check and execute the verfication code on your own.
