@@ -8,21 +8,22 @@
 #include <regex>
 using namespace std;
 
-template <typename Tx>
-ostream& operator<< (ostream& os, const vector<Tx> givenVector) {
-
-	for (Tx element : givenVector) {
-		os << element << " ";
-	}
-
-	return os;
-
-}
-
 class BASE64 {
 private:
 	// RFC 4648 Base64 Table (for encoding)
-	const char BASE64EncodingTable[64] = {
+	static const char BASE64EncodingTable[64];
+
+	// RFC 4648 Base64 Table (for decoding(remaked))
+	// Char in ASCII(BASE64EncodedMessage) -> Reverse of BASE64EncodingTable
+	static const int BASE64DecodingTable[131];
+
+	static int binaryStringToDecimal(string binaryString);			// Binary style string -> Decimal integer
+public:
+	static string BASE64Encode(string message);					// Encode Base64 (integrated process)
+	static string BASE64Decode(string message);                      // Decode BASE64
+};
+
+const char BASE64::BASE64EncodingTable[64] = {
 		'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
 		'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
 		'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
@@ -31,33 +32,25 @@ private:
 		'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
 		'w', 'x', 'y', 'z', '0', '1', '2', '3',
 		'4', '5', '6', '7', '8', '9', '+', '/'
-	};
-	
-	// RFC 4648 Base64 Table (for decoding(remaked))
-	// Char in ASCII(BASE64EncodedMessage) -> Reverse of BASE64EncodingTable
-	const int BASE64DecodingTable[131] = {
-	    // Corresponding values with BASE64Table            // ASCII
-	    -1,                                                 // 00
-	    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,             // 01 ~ 10
-	    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,             // 11 ~ 20
-	    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,             // 21 ~ 30
-	    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,             // 31 ~ 40
-	    -1, -1, 62, -1, -1, -1, 63, 52, 53, 54,             // 41 ~ 50     (- - + - - - / 0 1 2)
-	    55, 56, 57, 58, 59, 60, 61, -1, -1, -1,             // 51 ~ 60     (3 4 5 6 7 8 9 - - -)
-	    -1, -1, -1, -1, -1,  0,  1,  2,  3,  4,             // 61 ~ 70     (- - - - - A B C D E)
-	     5,  6,  7,  8,  9, 10, 11, 12, 13, 14,             // 71 ~ 80     (F G H I J K L M N O)
-	    15, 16, 17, 18, 19, 20, 21, 22, 23, 24,             // 81 ~ 90     (P Q R S T U V W X Y)
-	    25, -1, -1, -1, -1, -1, 26, 27, 28, 29,             // 91 ~ 100    (Z - - - - - a b c d)
-	    30, 31, 32, 33, 34, 35, 36, 37, 38, 39,             // 101 ~ 110   (e f g h i j k l m n)
-	    40, 41, 42, 43, 44, 45, 46, 47, 48, 49,             // 111 ~ 120   (o p q r s t u v w x)
-	    50, 51, -1, -1, -1, -1, -1, -1, -1, -1,             // 121 ~ 130   (y z - - - - - - - -)
-	};
-public:
-	int binaryStringToDecimal(string binaryString);			// Binary style string -> Decimal integer
+};
 
-	string binaryStringToBASE64(string binaryMessage);
-	string BASE64Encode(string message);					// Encode Base64 (integrated process)
-	void BASE64Decode(string message);                    // Decode BASE64
+
+const int BASE64::BASE64DecodingTable[131] = {
+		// Corresponding values with BASE64Table            // ASCII
+		-1,                                                 // 000
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,             // 001 ~ 010
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,             // 011 ~ 020
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,             // 021 ~ 030
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,             // 031 ~ 040
+		-1, -1, 62, -1, -1, -1, 63, 52, 53, 54,             // 041 ~ 050   (- - + - - - / 0 1 2)
+		55, 56, 57, 58, 59, 60, 61, -1, -1, -1,             // 051 ~ 060   (3 4 5 6 7 8 9 - - -)
+		-1, -1, -1, -1,  0,  1,  2,  3,  4,  5,             // 061 ~ 070   (- - - - A B C D E F)
+		 6,  7,  8,  9, 10, 11, 12, 13, 14, 15,             // 071 ~ 080   (G H I J K L M N O P)
+		16, 17, 18, 19, 20, 21, 22, 23, 24, 25,             // 081 ~ 090   (Q R S T U V W X Y Z)
+		-1, -1, -1, -1, -1, -1, 26, 27, 28, 29,             // 091 ~ 100   (- - - - - - a b c d)
+		30, 31, 32, 33, 34, 35, 36, 37, 38, 39,             // 101 ~ 110   (e f g h i j k l m n)
+		40, 41, 42, 43, 44, 45, 46, 47, 48, 49,             // 111 ~ 120   (o p q r s t u v w x)
+		50, 51, -1, -1, -1, -1, -1, -1, -1, -1,             // 121 ~ 130   (y z - - - - - - - -)
 };
 
 
@@ -88,11 +81,11 @@ int BASE64::binaryStringToDecimal(string binaryString) {
 
 // ** BASE64 ENCODE **
 string BASE64::BASE64Encode(string message) {
-    
-    // Convert normal string to binary style string
-    string binaryMessage = "";
-    for (char character : message)
-        binaryMessage += bitset<8>(character).to_string();
+
+	// Convert normal string to binary style string
+	string binaryMessage = "";
+	for (char character : message)
+		binaryMessage += bitset<8>(character).to_string();
 
 	// append padding (The input length should be the multiple of 24 bits(6 bits * 4 sextets), 
 	// but the bigger/the same comparing to the) given input message length()
@@ -143,22 +136,76 @@ string BASE64::BASE64Encode(string message) {
 
 
 // **BASE64 DECODE**
-void BASE64::BASE64Decode(string message) {
-    
-    // ASCII(BASE64 encoded) to binary
-    vector<string> binaryBASE64EncodedMessage;
-    for(char character : message)
-        binaryBASE64EncodedMessage.push_back(bitset<8> ((int)character).to_string());
-        
-    cout << binaryBASE64EncodedMessage << endl;
-    
+string BASE64::BASE64Decode(string message) {
+
+	// ASCII(BASE64 encoded) to binary
+	string binaryDecodedMessage;
+
+	// delete padding (Not used during decode process)
+	size_t pos = message.find("=");
+	while (pos != std::string::npos) {
+		message.erase(pos, 1);
+		pos = message.find("=", pos);
+	}
+
+	// Disintegrate the given message input(without padding)
+	// and every BASE64Encoded string character matches to the reverse version of Base64 Table
+	for (char character : message) {
+		string binaryOneByteMessage = bitset<8>((int)character).to_string();
+		int    sextetDecimal = BASE64::BASE64DecodingTable[BASE64::binaryStringToDecimal(binaryOneByteMessage)];
+
+		binaryDecodedMessage.append(bitset<6>(sextetDecimal).to_string());
+	}
+
+	string decodedMessage;
+	string characterBuffer;
+	int counter = 0;								// every 8 bits (1 byte)
+	
+	// Currently, the message has been processed as a binary format.
+	// To finalize, this procedure translates binary data to ASCII text format.
+	for (char character : binaryDecodedMessage) {
+
+		characterBuffer += character;
+		counter++;
+
+		if (counter % 8 == 0 && counter > 1) {
+
+			int octat = BASE64::binaryStringToDecimal(characterBuffer);
+
+			// Only printable ASCII characters are acceptable and transformable.
+			// Data which are out of range equals invalid characters or padding(=) in BASE64 encoding.
+			if (octat >= 32 && octat <= 126) {
+				decodedMessage += (char)octat;
+			}
+
+			characterBuffer = "";
+
+		}
+
+	}
+
+	return decodedMessage;
+
+
 }
+
 
 int main() {
 
-	BASE64 base64;
+	// You can run encode and decode function immediately
+	// because the functions are provided as static member functions of class BASE64.
 
-    cout << base64.BASE64Encode("M") << endl;
- 	base64.BASE64Decode("TQ==");
+	// encoding example
+	cout << BASE64::BASE64Encode("A") << endl;									// QQ==
+	cout << BASE64::BASE64Encode("Github") << endl;								// R2l0aHVi
+	cout << BASE64::BASE64Encode("@KnightChaser") << endl;						// QEtuaWdodENoYXNlcg==
+	cout << BASE64::BASE64Encode("https://www.github.com/") << endl;			// aHR0cHM6Ly93d3cuZ2l0aHViLmNvbS8=
+
+	// decoding example
+	cout << endl;
+	cout << BASE64::BASE64Decode("QQ==") << endl;								// A
+	cout << BASE64::BASE64Decode("R2l0aHVi") << endl;							// Github
+	cout << BASE64::BASE64Decode("QEtuaWdodENoYXNlcg==") << endl;				// @KnightChaser
+	cout << BASE64::BASE64Decode("aHR0cHM6Ly93d3cuZ2l0aHViLmNvbS8=") << endl;	// https://www.github.com
 
 }
