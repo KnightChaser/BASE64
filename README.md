@@ -83,7 +83,7 @@ int main() {
 	for (int _seq = 0; _seq < 100; _seq++) {
 		string randomString = generateRandomString();
 		cout << randomString << " ";
-		if ((base64.BASE64Decode(BASE64::BASE64Encode(randomString)) == randomString)) {
+		if ((BASE64::BASE64Decode(BASE64::BASE64Encode(randomString)) == randomString)) {
 			cout << "[OK]" << endl;
 		}
 		else {
