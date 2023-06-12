@@ -6,6 +6,9 @@
 #include <vector>
 #include <string>
 #include <regex>
+#include <cctype>
+#include <cstdlib>
+#include <algorithm>
 using namespace std;
 
 class BASE64 {
@@ -17,11 +20,14 @@ private:
 	// Char in ASCII(BASE64EncodedMessage) -> Reverse of BASE64EncodingTable
 	static const int BASE64DecodingTable[131];
 
-	static int	  binaryStringToDecimal(string binaryString);	// Binary style string -> Decimal integer
+	static int	  binaryStringToDecimal(string binaryString);			// Binary style string -> Decimal integer
 	static bool	  isStringASCII(string message);				// Is the given string fully consisted of ASCII characters?
 public:
+	static bool   isNumber(const string input);					// Check if the given string a real number
+	static string lineSplitting(string BASE64message, int lenght);			// print with line splitting
+
 	static string BASE64Encode(string message);					// Encode Base64 (integrated process)
-	static string BASE64Decode(string message);                 // Decode BASE64
+	static string BASE64Decode(string message);					// Decode BASE64
 };
 
 const char BASE64::BASE64EncodingTable[64] = {
@@ -152,6 +158,9 @@ string BASE64::BASE64Encode(string message) {
 // **BASE64 DECODE**
 string BASE64::BASE64Decode(string message) {
 
+	// When the user tries to input multiple lines, it's essential to remove newline character which isn't used in BASE64 encoding.
+	message.erase(remove(message.begin(), message.end(), '\n'), message.cend());
+
 	if (!BASE64::isStringASCII(message))
 		throw "The given string isn't fully consisted of ASCII characters. Please check your input.";
 
@@ -206,19 +215,55 @@ string BASE64::BASE64Decode(string message) {
 
 }
 
+string BASE64::lineSplitting(string BASE64message, int length) {
+
+	int characterCount = 1;
+	string result;
+
+	for (char character : BASE64message) {
+		result += character;
+		if (characterCount % length == 0)
+			result += '\n';
+
+		characterCount++;
+	}
+
+	return result;
+
+}
+
+bool BASE64::isNumber(const string input){
+
+	// Accepts only pure number
+	for (char const ch : input) {
+		if (isdigit(ch) == 0)
+			return false;
+	}
+	return true;
+}
+
 
 int main(int argc, char* argv[]) {
 
 	// USER INTERACTION FORMAT (commandline)
 	//	./base64.exe -e PLAIN_MESSAGE						// encode
+	//  ./base64.exe -e PLAIN_MESSAGE -l CHAR_PER_LINE      // encode (print with line splitting)
 	//  ./base64.exe -d BASE64_ENCODED_MESSAGE				// decode
 	//  ./base64.exe -h										// help
 
-	if (argc == 3 && strcmp(argv[1], "-e") == 0) {						// encode requested
+	cout << endl;
+
+	if (strcmp(argv[1], "-e") == 0) {						// encode requested
 
 		try {
-			cout << BASE64::BASE64Encode(argv[2]) << endl;
-		} catch (const char * errorMessage) {
+			if (argc == 3)
+				cout << BASE64::BASE64Encode(argv[2]) << endl;
+			else if (argc == 5 && strcmp(argv[3], "-l") == 0, BASE64::isNumber(argv[4]))
+				cout << BASE64::lineSplitting(BASE64::BASE64Encode(argv[2]), atoi(argv[4])) << endl;
+			else
+				throw "Wrong format. Would you like to try with [-h] option?";
+		}
+		catch (const char * errorMessage) {
 			cout << "Error occured: " << errorMessage << endl;
 		}
 
@@ -237,6 +282,7 @@ int main(int argc, char* argv[]) {
 
 		cout << "Be aware that this tool supports only ASCII string." << endl;
 		cout << "[ENCODE] ./base64.exe -e PLAIN_MESSAGE" << endl;
+		cout << "[ENCODE] ./base64.exe -e PLAIN_MESSAGE -l CHAR_PER_LINE" << endl;
 		cout << "[DECODE] ./base64.exe -d BASE64_ENCODED_MESSAGE" << endl;
 		cout << "[HELP]   ./base64.exe -h" << endl;
 
@@ -246,6 +292,8 @@ int main(int argc, char* argv[]) {
 		cout << "Wrong way to execute the program. Would you like to try with [-h] option?" << endl;
 
 	}
+
+	cout << endl;
 
 	return 0;
 
